@@ -1,0 +1,16 @@
+---
+input: "/tmp/Input"
+output: "/tmp/Output"
+ansible_python_interpreter: "/usr/bin/python3"
+software:
+  - python3-pip
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - software-properties-common
+  - virtualenv
+  - python3-setuptools
+pip_software:
+  - docker
+  - docker-compose
+  - PyYAML

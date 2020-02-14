@@ -1,0 +1,65 @@
+---
+- name: Install packages
+  apt:
+     name: "{{ software }}"
+     state: latest
+     update_cache: yes
+- name: Install python library
+  pip:
+    name: "{{ pip_software }}"
+    virtualenv_command: "{{ ansible_python_interpreter }}"
+
+- name: Create project Input/Output directory
+  file:
+     path: "{{ item }}"
+     state: directory
+     mode: 0755
+     owner: root
+     group: root
+  loop:
+    - "{{ input }}"
+    - "{{ output }}"
+
+- name: Create project directory
+  file:
+     path: "/check_log"
+     state: directory
+     mode: 0755
+     owner: root
+     group: root
+
+- name:
+  copy:
+    src: "{{ item }}"
+    dest: "/check_log"
+  with_fileglob: "*"
+
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/debian buster stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt:
+    update_cache: yes
+    name: docker-ce
+    state: latest
+
+- name: Up container
+  docker_compose:
+    project_name: check_log
+    definition:
+      version: "3"
+      services:
+        check_log:
+          build: "/check_log"
+          command: "python ./main.py"
+          volumes:
+            - "{{ input }}:/check_log/Input/"
+            - "{{ output }}:/check_log/Output/"

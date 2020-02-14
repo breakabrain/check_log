@@ -1,0 +1,6 @@
+---
+- hosts: local_host
+  gather_facts: no
+  become: no
+  roles:
+    - check_log
